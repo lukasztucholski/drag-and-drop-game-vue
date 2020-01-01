@@ -2,7 +2,7 @@
   <div
     :class="[
       'default-card',
-      { 'hidden-card': upside, 'not-draggable': !isDraggable },
+      { 'hidden-card': reversed, 'not-draggable': !isDraggable },
     ]"
     :style="computedStyles"
     :draggable="isDraggable"
@@ -22,7 +22,7 @@ export default {
       type: Boolean,
       default: true,
     },
-    upside: {
+    reversed: {
       type: Boolean,
       default: false,
     },

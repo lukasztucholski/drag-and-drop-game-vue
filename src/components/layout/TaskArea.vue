@@ -1,19 +1,16 @@
 <template>
   <div>
-    TaskArea<br />
-    Card to search: {{ cardToSearch }}
+    TaskArea
+    <PreparedCards area="task" />
   </div>
 </template>
 
 <script>
+import PreparedCards from '../cards/PreparedCards';
+
 export default {
   name: 'TaskArea',
 
-  props: {
-    cardToSearch: {
-      type: Number,
-      default: 0,
-    },
-  },
+  components: { PreparedCards },
 };
 </script>
