@@ -1,6 +1,6 @@
 <template>
   <div>
-    Pick A Card:
+    <span class="title d-block mb-5">Pick A Card:</span>
     <PreparedCards area="pickup" />
   </div>
 </template>

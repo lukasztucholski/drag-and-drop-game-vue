@@ -58,10 +58,11 @@ export default {
         order: this.isDraggable ? Math.floor(Math.random() * 10) : 0,
         margin: this.isDraggable
           ? `
-        ${this.getRandomMargin('y')}px
-        ${this.getRandomMargin('x')}px
-        ${this.getRandomMargin('y')}px
-        ${this.getRandomMargin('x')}px`
+              ${this.getRandomMargin('y')}px
+              ${this.getRandomMargin('x')}px
+              ${this.getRandomMargin('y')}px
+              ${this.getRandomMargin('x')}px
+            `
           : 0,
       };
     },
@@ -75,10 +76,14 @@ export default {
     },
 
     onDragStart(event) {
+      if (this.$store.state.scoreArea.scoreTime === 0) {
+        this.$store.dispatch('scoreArea/startScoreTimer');
+      }
+
       event.dataTransfer.setData('text/html', event.target.id);
+
       // trick for hide dragged element in original place
       setTimeout(() => event.target.classList.add('is-dragged'), 1);
-      //TODO: start score timer
     },
 
     onDragEnd(event) {
@@ -93,18 +98,20 @@ export default {
       const targedSlot = event.target;
       const targetSlotIndex = targedSlot.id.slice(-1);
 
-      if (draggedCardIndex != this.searchedCardIndex) {
-        this.$emit('warning');
-        //TODO: add 10s in score timer
-        return;
-      }
-
-      if (draggedCardIndex === targetSlotIndex) {
+      if (
+        draggedCardIndex === targetSlotIndex &&
+        draggedCardIndex == this.searchedCardIndex
+      ) {
         const draggedCard = document.getElementById(draggedCardId);
+        draggedCard.draggable = false;
         targedSlot.replaceWith(draggedCard);
         this.$store.commit('resultArea/SET_CARD_STATUS', draggedCardIndex);
-        this.$store.dispatch('taskArea/randomCardToSearch');
+      } else {
+        this.$emit('warning');
+        this.$store.commit('scoreArea/INCREMENT_SCORE_TIME', 10);
       }
+
+      this.$store.dispatch('taskArea/randomCardToSearch');
     },
   },
 };

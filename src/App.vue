@@ -20,13 +20,14 @@
             class="text-uppercase"
             top
           >
-            You won! Gratulations! Game will restart after 10 seconds
+            You won with time {{ $store.state.scoreArea.scoreTime }} seconds!
+            Gratulations! Game will restart after 10 seconds
           </v-snackbar>
         </v-col>
 
         <v-col cols="2">
           <ScoreArea />
-          <TaskArea v-if="!gameIsOver" />
+          <TaskArea v-if="!gameIsOver" class="mt-4" />
         </v-col>
       </v-row>
     </v-container>
@@ -59,19 +60,23 @@ export default {
     gameIsOver() {
       if (this.gameIsOver) {
         setTimeout(this.initGame, 10000);
+        this.$store.dispatch('scoreArea/stopScoreTimer');
       }
     },
   },
 
   mounted() {
-    this.initGame();
+    this.initApp();
   },
 
   methods: {
-    initGame() {
+    initApp() {
       this.$store.dispatch('resultArea/initCardsStatuses');
       this.$store.dispatch('taskArea/randomCardToSearch');
-      //TODO: restart timer
+    },
+    initGame() {
+      this.initApp();
+      this.$store.dispatch('scoreArea/startScoreTimer');
     },
   },
 };

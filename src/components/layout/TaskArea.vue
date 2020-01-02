@@ -1,6 +1,6 @@
 <template>
   <div>
-    Find This Card:
+    <span class="title d-block mb-5">Find This Card:</span>
     <PreparedCards area="task" />
   </div>
 </template>

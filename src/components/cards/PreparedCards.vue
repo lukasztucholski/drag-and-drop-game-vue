@@ -8,7 +8,8 @@
       class="text-uppercase"
       top
     >
-      The selected card is not the card you are looking for
+      The selected card is not the card you are looking for or you choose wrong
+      slot!
     </v-snackbar>
 
     <SingleCard

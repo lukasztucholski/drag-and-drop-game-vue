@@ -12,12 +12,17 @@ export default {
   },
 
   actions: {
-    randomCardToSearch({ commit, dispatch, rootState, rootGetters }) {
+    randomCardToSearch({ commit, dispatch, state, rootState, rootGetters }) {
       if (rootGetters['resultArea/gameIsOver']) return;
 
       const randomNumber = Math.floor(
         Math.random() * rootState.selectedProvider.cardsCount
       );
+
+      if (randomNumber === state.searchedCardIndex) {
+        dispatch('randomCardToSearch');
+        return;
+      }
 
       rootState.resultArea.cardsFoundStatuses[randomNumber]
         ? dispatch('randomCardToSearch')

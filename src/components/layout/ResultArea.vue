@@ -1,6 +1,6 @@
 <template>
   <div>
-    Drag And Drop To Correct Slot:
+    <span class="title d-block mb-5">Drag And Drop To Correct Slot:</span>
     <PreparedCards area="result" />
   </div>
 </template>
