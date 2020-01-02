@@ -3,7 +3,7 @@
     <v-snackbar
       v-if="isResultArea"
       v-model="warning"
-      :timeout="2000"
+      :timeout="5000"
       color="red"
       class="text-uppercase"
       top
