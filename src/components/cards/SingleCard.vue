@@ -2,7 +2,7 @@
   <div
     :class="[
       'default-card',
-      { 'hidden-card': upside, 'not-draggable': !isDraggable },
+      { 'hidden-card': reversed, 'not-draggable': !isDraggable },
     ]"
     :style="computedStyles"
     :draggable="isDraggable"
@@ -22,7 +22,7 @@ export default {
       type: Boolean,
       default: true,
     },
-    upside: {
+    reversed: {
       type: Boolean,
       default: false,
     },
@@ -42,7 +42,7 @@ export default {
       type: [String, Number],
       default: 0,
     },
-    cardToSearch: {
+    searchedCardIndex: {
       type: Number,
       default: 0,
     },
@@ -56,35 +56,62 @@ export default {
         backgroundImage: `url(${this.backgroundUrl})`,
         backgroundPositionX: `${this.backgroundPositionX}px`,
         order: this.isDraggable ? Math.floor(Math.random() * 10) : 0,
+        margin: this.isDraggable
+          ? `
+              ${this.getRandomMargin('y')}px
+              ${this.getRandomMargin('x')}px
+              ${this.getRandomMargin('y')}px
+              ${this.getRandomMargin('x')}px
+            `
+          : 0,
       };
     },
   },
 
   methods: {
-    onDragStart(e) {
-      e.dataTransfer.setData('text/html', e.target.id);
-      setTimeout(() => e.target.classList.add('is-dragged'), 1);
+    getRandomMargin(axis) {
+      return axis === 'x'
+        ? Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10)
+        : (Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10)) * 3;
     },
 
-    onDragEnd(e) {
-      //temporary
-      e.target.classList.remove('is-dragged');
+    onDragStart(event) {
+      if (this.$store.state.scoreArea.scoreTime === 0) {
+        this.$store.dispatch('scoreArea/startScoreTimer');
+      }
+
+      event.dataTransfer.setData('text/html', event.target.id);
+
+      // trick for hide dragged element in original place
+      setTimeout(() => event.target.classList.add('is-dragged'), 1);
     },
 
-    onDrop(e) {
+    onDragEnd(event) {
+      event.target.classList.remove('is-dragged');
+    },
+
+    onDrop(event) {
       if (this.isDraggable) return;
-      const draggedItemId = e.dataTransfer.getData('text/html');
-      const draggedItemNumb = draggedItemId.slice(-1);
-      const targetDivNumb = e.target.id.slice(-1);
-      console.log(draggedItemId, e.target.id);
 
-      if (draggedItemNumb != this.cardToSearch) {
-        console.log('other card in the task!');
+      const draggedCardId = event.dataTransfer.getData('text/html');
+      const draggedCardIndex = draggedCardId.slice(-1);
+      const targedSlot = event.target;
+      const targetSlotIndex = targedSlot.id.slice(-1);
+
+      if (
+        draggedCardIndex === targetSlotIndex &&
+        draggedCardIndex == this.searchedCardIndex
+      ) {
+        const draggedCard = document.getElementById(draggedCardId);
+        draggedCard.draggable = false;
+        targedSlot.replaceWith(draggedCard);
+        this.$store.commit('resultArea/SET_CARD_STATUS', draggedCardIndex);
+      } else {
+        this.$emit('warning');
+        this.$store.commit('scoreArea/INCREMENT_SCORE_TIME', 10);
       }
 
-      if (draggedItemNumb === targetDivNumb) {
-        console.log('correct place for this card!');
-      }
+      this.$store.dispatch('taskArea/randomCardToSearch');
     },
   },
 };

@@ -1,6 +1,8 @@
 <template>
   <div>
-    ScoreArea
+    <span class="title d-block mb-5">
+      Score: {{ $store.state.scoreArea.scoreTime }} seconds
+    </span>
   </div>
 </template>
 

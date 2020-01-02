@@ -2,18 +2,32 @@
   <v-app class="app">
     <v-container>
       <v-row no-gutters>
-        <v-col cols="9">
-          <PickupArea :settings="{ ...selectedProvider, isGuessed }" />
-          <ResultArea
-            :cards-count="selectedProvider.cardsCount"
-            :cards-size="selectedProvider.cardsSize"
-            :card-to-search="cardNumbToSearch"
+        <v-col cols="10">
+          <template v-if="!gameIsOver">
+            <PickupArea />
+            <ResultArea />
+          </template>
+
+          <v-img
+            v-else
+            :src="$store.state.selectedProvider.cardsBackroundUrl"
           />
+
+          <v-snackbar
+            :value="gameIsOver"
+            :timeout="10000"
+            color="success"
+            class="text-uppercase"
+            top
+          >
+            You won with time {{ $store.state.scoreArea.scoreTime }} seconds!
+            Gratulations! Game will restart after 10 seconds
+          </v-snackbar>
         </v-col>
 
-        <v-col cols="3">
+        <v-col cols="2">
           <ScoreArea />
-          <TaskArea :card-to-search="cardNumbToSearch" />
+          <TaskArea v-if="!gameIsOver" class="mt-4" />
         </v-col>
       </v-row>
     </v-container>
@@ -21,7 +35,6 @@
 </template>
 
 <script>
-import { selectedProvider } from './config/providers.config';
 import PickupArea from './components/layout/PickupArea';
 import ResultArea from './components/layout/ResultArea';
 import ScoreArea from './components/layout/ScoreArea';
@@ -37,31 +50,33 @@ export default {
     TaskArea,
   },
 
-  data() {
-    return {
-      selectedProvider,
-      isGuessed: [],
-      cardNumbToSearch: null,
-    };
+  computed: {
+    gameIsOver() {
+      return this.$store.getters['resultArea/gameIsOver'];
+    },
+  },
+
+  watch: {
+    gameIsOver() {
+      if (this.gameIsOver) {
+        setTimeout(this.initGame, 10000);
+        this.$store.dispatch('scoreArea/stopScoreTimer');
+      }
+    },
   },
 
   mounted() {
-    // TODO Automatize isGuesses Array with cardsCount from config
-    this.isGuessed = [false, false, false, false, false];
-    this.randomCardToSearch();
+    this.initApp();
   },
 
   methods: {
-    randomCardToSearch() {
-      if (!this.isGuessed.includes(false)) return;
-
-      const randomNumber = Math.floor(
-        Math.random() * this.selectedProvider.cardsCount
-      );
-
-      this.isGuessed[randomNumber]
-        ? this.randomCardToSearch
-        : (this.cardNumbToSearch = randomNumber);
+    initApp() {
+      this.$store.dispatch('resultArea/initCardsStatuses');
+      this.$store.dispatch('taskArea/randomCardToSearch');
+    },
+    initGame() {
+      this.initApp();
+      this.$store.dispatch('scoreArea/startScoreTimer');
     },
   },
 };
