@@ -1,6 +1,6 @@
 <template>
   <div>
-    ResultArea
+    Drag And Drop To Correct Slot:
     <PreparedCards area="result" />
   </div>
 </template>

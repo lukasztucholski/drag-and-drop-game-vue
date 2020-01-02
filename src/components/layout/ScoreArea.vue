@@ -1,6 +1,6 @@
 <template>
   <div>
-    ScoreArea
+    Score: 0 seconds
   </div>
 </template>
 

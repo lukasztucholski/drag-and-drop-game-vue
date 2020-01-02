@@ -1,11 +1,15 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import { selectedProvider } from '../config/providers.config';
+import taskArea from './task-area.module';
+import resultArea from './result-area.module';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-  state: {},
+  state: { selectedProvider },
   mutations: {},
   actions: {},
-  modules: {},
+  getters: {},
+  modules: { taskArea, resultArea },
 });

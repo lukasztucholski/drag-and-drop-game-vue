@@ -42,7 +42,7 @@ export default {
       type: [String, Number],
       default: 0,
     },
-    cardToSearch: {
+    searchedCardIndex: {
       type: Number,
       default: 0,
     },
@@ -56,34 +56,54 @@ export default {
         backgroundImage: `url(${this.backgroundUrl})`,
         backgroundPositionX: `${this.backgroundPositionX}px`,
         order: this.isDraggable ? Math.floor(Math.random() * 10) : 0,
+        margin: this.isDraggable
+          ? `
+        ${this.getRandomMargin('y')}px
+        ${this.getRandomMargin('x')}px
+        ${this.getRandomMargin('y')}px
+        ${this.getRandomMargin('x')}px`
+          : 0,
       };
     },
   },
 
   methods: {
-    onDragStart(e) {
-      e.dataTransfer.setData('text/html', e.target.id);
-      setTimeout(() => e.target.classList.add('is-dragged'), 1);
+    getRandomMargin(axis) {
+      return axis === 'x'
+        ? Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10)
+        : (Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10)) * 3;
     },
 
-    onDragEnd(e) {
-      //temporary
-      e.target.classList.remove('is-dragged');
+    onDragStart(event) {
+      event.dataTransfer.setData('text/html', event.target.id);
+      // trick for hide dragged element in original place
+      setTimeout(() => event.target.classList.add('is-dragged'), 1);
+      //TODO: start score timer
     },
 
-    onDrop(e) {
+    onDragEnd(event) {
+      event.target.classList.remove('is-dragged');
+    },
+
+    onDrop(event) {
       if (this.isDraggable) return;
-      const draggedItemId = e.dataTransfer.getData('text/html');
-      const draggedItemNumb = draggedItemId.slice(-1);
-      const targetDivNumb = e.target.id.slice(-1);
-      console.log(draggedItemId, e.target.id);
 
-      if (draggedItemNumb != this.cardToSearch) {
-        console.log('other card in the task!');
+      const draggedCardId = event.dataTransfer.getData('text/html');
+      const draggedCardIndex = draggedCardId.slice(-1);
+      const targedSlot = event.target;
+      const targetSlotIndex = targedSlot.id.slice(-1);
+
+      if (draggedCardIndex != this.searchedCardIndex) {
+        this.$emit('warning');
+        //TODO: add 10s in score timer
+        return;
       }
 
-      if (draggedItemNumb === targetDivNumb) {
-        console.log('correct place for this card!');
+      if (draggedCardIndex === targetSlotIndex) {
+        const draggedCard = document.getElementById(draggedCardId);
+        targedSlot.replaceWith(draggedCard);
+        this.$store.commit('resultArea/SET_CARD_STATUS', draggedCardIndex);
+        this.$store.dispatch('taskArea/randomCardToSearch');
       }
     },
   },

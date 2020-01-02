@@ -1,6 +1,6 @@
 <template>
   <div>
-    PickupArea
+    Pick A Card:
     <PreparedCards area="pickup" />
   </div>
 </template>

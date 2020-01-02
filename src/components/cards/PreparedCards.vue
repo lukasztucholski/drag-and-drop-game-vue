@@ -1,6 +1,16 @@
 <template>
   <v-row>
-    {{ cardNumbToSearch }}
+    <v-snackbar
+      v-if="isResultArea"
+      v-model="warning"
+      :timeout="2000"
+      color="red"
+      class="text-uppercase"
+      top
+    >
+      The selected card is not the card you are looking for
+    </v-snackbar>
+
     <SingleCard
       v-for="(card, index) in cardsCount"
       :id="`card_${area}_${index}`"
@@ -10,18 +20,18 @@
       :background-url="isResultArea ? null : selectedProvider.cardsBackroundUrl"
       :background-position-x="
         selectedProvider.cardsBackgroundPosition[
-          isTaskArea ? cardNumbToSearch : index
+          isTaskArea ? searchedCardIndex : index
         ]
       "
-      :reversed="isPickupArea ? !isGuessed[index] : false"
-      :is-draggable="isPickupArea"
-      :card-to-search="cardNumbToSearch"
+      :reversed="isPickupArea ? !cardsFoundStatuses[index] : false"
+      :is-draggable="isPickupArea && !cardsFoundStatuses[index]"
+      :searched-card-index="searchedCardIndex"
+      @warning="warning = true"
     />
   </v-row>
 </template>
 
 <script>
-import { selectedProvider } from '../../config/providers.config';
 import SingleCard from './SingleCard';
 
 export default {
@@ -38,13 +48,20 @@ export default {
 
   data() {
     return {
-      selectedProvider,
-      isGuessed: [],
-      cardNumbToSearch: null,
+      warning: false,
     };
   },
 
   computed: {
+    selectedProvider() {
+      return this.$store.state.selectedProvider;
+    },
+    cardsFoundStatuses() {
+      return this.$store.state.resultArea.cardsFoundStatuses;
+    },
+    searchedCardIndex() {
+      return this.$store.state.taskArea.searchedCardIndex;
+    },
     isPickupArea() {
       return this.area === 'pickup';
     },
@@ -57,11 +74,6 @@ export default {
     cardsCount() {
       return this.isTaskArea ? 1 : this.selectedProvider.cardsCount;
     },
-  },
-
-  mounted() {
-    // TODO Automatize isGuesses Array with cardsCount from config
-    this.isGuessed = [false, false, false, false, false];
   },
 };
 </script>

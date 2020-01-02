@@ -1,6 +1,6 @@
 <template>
   <div>
-    TaskArea
+    Find This Card:
     <PreparedCards area="task" />
   </div>
 </template>

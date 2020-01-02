@@ -2,14 +2,31 @@
   <v-app class="app">
     <v-container>
       <v-row no-gutters>
-        <v-col cols="9">
-          <PickupArea />
-          <ResultArea />
+        <v-col cols="10">
+          <template v-if="!gameIsOver">
+            <PickupArea />
+            <ResultArea />
+          </template>
+
+          <v-img
+            v-else
+            :src="$store.state.selectedProvider.cardsBackroundUrl"
+          />
+
+          <v-snackbar
+            :value="gameIsOver"
+            :timeout="10000"
+            color="success"
+            class="text-uppercase"
+            top
+          >
+            You won! Gratulations! Game will restart after 10 seconds
+          </v-snackbar>
         </v-col>
 
-        <v-col cols="3">
+        <v-col cols="2">
           <ScoreArea />
-          <TaskArea />
+          <TaskArea v-if="!gameIsOver" />
         </v-col>
       </v-row>
     </v-container>
@@ -32,19 +49,31 @@ export default {
     TaskArea,
   },
 
-  // methods: {
-  //   randomCardToSearch() {
-  //     if (!this.isGuessed.includes(false)) return;
+  computed: {
+    gameIsOver() {
+      return this.$store.getters['resultArea/gameIsOver'];
+    },
+  },
 
-  //     const randomNumber = Math.floor(
-  //       Math.random() * this.selectedProvider.cardsCount
-  //     );
+  watch: {
+    gameIsOver() {
+      if (this.gameIsOver) {
+        setTimeout(this.initGame, 10000);
+      }
+    },
+  },
 
-  //     this.isGuessed[randomNumber]
-  //       ? this.randomCardToSearch
-  //       : (this.cardNumbToSearch = randomNumber);
-  //   },
-  // },
+  mounted() {
+    this.initGame();
+  },
+
+  methods: {
+    initGame() {
+      this.$store.dispatch('resultArea/initCardsStatuses');
+      this.$store.dispatch('taskArea/randomCardToSearch');
+      //TODO: restart timer
+    },
+  },
 };
 </script>
 
