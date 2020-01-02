@@ -1,5 +1,7 @@
 # drag-and-drop-game-vue
 
+## LIVE DEMO https://drag-and-drop-game-vue.netlify.com/
+
 ## Project setup
 ```
 npm install
